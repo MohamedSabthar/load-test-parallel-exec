@@ -55,6 +55,7 @@ isolated function initContext(http:RequestContext requestContext, http:Request r
         }
         context.set(USER, user);
         context.set(USER_ID, userId);
+        log:printInfo(string `Received request from ${userId}`);
     }
     return context;
 }
@@ -71,18 +72,6 @@ type LoginContext record {
     string userId;
     string user;
     string dataSource;
-};
-
-isolated function createLogingContext(graphql:Context ctx) returns LoginContext|error {
-    transaction {
-        LoginContext lc = {
-            userId: check getStringContextValue(ctx, USER),
-            user: check getStringContextValue(ctx, USER_ID),
-            dataSource: ""
-        };
-        check commit;
-        return lc;
-    }
 };
 
 isolated function getStringContextValue(graphql:Context ctx, string key) returns string|error {

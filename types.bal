@@ -325,7 +325,7 @@ readonly service class TimeLog {
         anydata|error result = context.resolve('field);
         time:Utc endTime = time:utcNow();
         time:Seconds utcDiffSeconds = time:utcDiffSeconds(endTime, startTime);
-        log:printInfo("Execution time for field: " + 'field.getAlias() + "-" + utcDiffSeconds.toString() + " s");
+        log:printInfo("Execution time for field: " + 'field.getAlias() + " " + utcDiffSeconds.toString() + " s");
         return result;
     }
 }

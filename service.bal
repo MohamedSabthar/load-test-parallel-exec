@@ -40,14 +40,8 @@ isolated service on new graphql:Listener(httpListener) {
 
     resource function get movieStream(graphql:Context context, DirectorInputType director) returns Movie[]|error {
         do {
-            time:Utc? st = time:utcNow();
             datasource:Datasource datasource = check context.get(DATASOURCE).ensureType();
-            LoginContext lc = check createLogingContext(context);
             stream<MovieRecord, error?> movieStream = check datasource->getMovies();
-            time:Utc et = time:utcNow();
-            time:Seconds diff = time:utcDiffSeconds(et, <time:Utc>st);
-            // log:printInfo(string `time ${diff}`);
-            // runtime:sleep(5);
             return from MovieRecord movieRecord in movieStream
                 select new (movieRecord);
         } on fail error err {
@@ -59,7 +53,6 @@ isolated service on new graphql:Listener(httpListener) {
     isolated resource function get movies(graphql:Context context, MovieInputType[] inputs) returns MovieRecordType[]|error {
         do {
             time:Utc? st = time:utcNow();
-            LoginContext lc = check createLogingContext(context);
             future<MovieRecordType|error>[] movieRecords = [];
             future<datasource:Director|error>[] directorFutures = [];
             foreach MovieInputType item in inputs {
@@ -68,7 +61,6 @@ isolated service on new graphql:Listener(httpListener) {
                 directorFutures.push(futures);
                 movieRecords.push(mvrt);
             }
-            // runtime:sleep(5);
             MovieRecordType[] mvs = [];
             DirectorType[] directorTypes = [];
             int i = 0;
@@ -104,13 +96,11 @@ isolated service on new graphql:Listener(httpListener) {
     isolated resource function get moviesByDirector(graphql:Context context, MovieInputType[] inputs) returns MovieRecordType[]|error {
         do {
             time:Utc? st = time:utcNow();
-            LoginContext lc = check createLogingContext(context);
             future<MovieRecordType|error>[] movieRecords = [];
             foreach MovieInputType item in inputs {
                 future<MovieRecordType|error> mvrt = start self.moviesByIds(context, item.id, item.director.id);
                 movieRecords.push(mvrt);
             }
-            // runtime:sleep(5);
             MovieRecordType[] mvs = [];
             foreach future<MovieRecordType|error> 'future in movieRecords {
                 MovieRecordType mv = check wait 'future;
@@ -129,7 +119,6 @@ isolated service on new graphql:Listener(httpListener) {
     isolated function moviesByIds(graphql:Context context, string movieId, string directorId) returns MovieRecordType|error {
         do {
             time:Utc? st = time:utcNow();
-            LoginContext lc = check createLogingContext(context);
             datasource:Datasource datasource = check context.get(DATASOURCE).ensureType();
             datasource:Movie movieById = check datasource->getMovieById(movieId);
             datasource:Director directorById = check datasource->getDirectorById(directorId);
@@ -164,7 +153,6 @@ isolated service on new graphql:Listener(httpListener) {
     isolated resource function get getMoviesById(graphql:Context context, string[] ids) returns Movie[]|error {
         do {
             time:Utc? st = time:utcNow();
-            LoginContext lc = check createLogingContext(context);
             datasource:Datasource datasource = check context.get(DATASOURCE).ensureType();
             future<datasource:Movie|error>[] movieFutures = [];
             foreach string id in ids {
@@ -195,7 +183,6 @@ isolated service on new graphql:Listener(httpListener) {
     isolated resource function get usersStream(graphql:Context context, UserInputType[] userInput) returns User[]|error {
         do {
             time:Utc? st = time:utcNow();
-            LoginContext lc = check createLogingContext(context);
             datasource:Datasource datasource = check context.get(DATASOURCE).ensureType();
             stream<UserRecord, error?> userStream = check datasource->getUsers();
             time:Utc et = time:utcNow();
@@ -212,7 +199,6 @@ isolated service on new graphql:Listener(httpListener) {
     isolated resource function get users(graphql:Context context, UserInputType[] userInput) returns UserRecordType[]|error {
         do {
             time:Utc? st = time:utcNow();
-            LoginContext lc = check createLogingContext(context);
             datasource:Datasource datasource = check context.get(DATASOURCE).ensureType();
             future<UserRecord|error>[] userRecords = [];
             foreach UserInputType item in userInput {
@@ -245,7 +231,6 @@ isolated service on new graphql:Listener(httpListener) {
     resource function get directorsStream(graphql:Context context, DirectorInputType[] directorInputs) returns Director[]|error {
         do {
             time:Utc? st = time:utcNow();
-            LoginContext lc = check createLogingContext(context);
             datasource:Datasource datasource = check context.get(DATASOURCE).ensureType();
             stream<DirectorRecord, error?> directorStream = check datasource->getDirectors();
             DirectorRecord[] directors = check from DirectorRecord directorRecord in directorStream
@@ -270,7 +255,6 @@ isolated service on new graphql:Listener(httpListener) {
     resource function get directors(graphql:Context context, DirectorInputType[] directors) returns DirectorType[]|error {
         do {
             time:Utc? st = time:utcNow();
-            LoginContext lc = check createLogingContext(context);
             datasource:Datasource datasource = check context.get(DATASOURCE).ensureType();
             future<datasource:Director|error>[] directorFutures = [];
             foreach DirectorInputType item in directors {
@@ -303,7 +287,6 @@ isolated service on new graphql:Listener(httpListener) {
     resource function get director(graphql:Context context, @graphql:ID string id) returns Director|error {
         do {
             time:Utc? st = time:utcNow();
-            LoginContext lc = check createLogingContext(context);
             datasource:Datasource datasource = check context.get(DATASOURCE).ensureType();
             DirectorRecord|error directorRecord = datasource->getDirector(id);
             if directorRecord is error {
@@ -457,10 +440,4 @@ isolated service on new graphql:Listener(httpListener) {
         check context.invalidate("directors");
         return new (result);
     }
-
-    // # Subscribes to the movies, to get updates when a new movie is published.
-    // # + return - A stream of movies
-    // isolated resource function subscribe movies(string userId) returns stream<Movie, error?>|error {
-    //     return pubsub.subscribe(MOVIE_TOPIC, 10);
-    // }
 }
