@@ -10,17 +10,17 @@
     </TestPlan>
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
-        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.num_threads">50</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">false</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
-          <stringProp name="LoopController.loops">1</stringProp>
+          <stringProp name="LoopController.loops">100</stringProp>
           <boolProp name="LoopController.continue_forever">false</boolProp>
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="GraphQLHTTPSamplerGui" testclass="HTTPSamplerProxy" testname="GraphQL HTTP Request">
+        <HTTPSamplerProxy guiclass="GraphQLHTTPSamplerGui" testclass="HTTPSamplerProxy" testname="GraphQL HTTP Request" enabled="true">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">9090</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -337,7 +337,7 @@
           <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor">
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
             <stringProp name="cacheKey">true</stringProp>
             <stringProp name="filename"></stringProp>
             <stringProp name="parameters"></stringProp>
@@ -350,7 +350,7 @@ vars.put(&quot;random&quot;, String.valueOf(randomValue))
             <stringProp name="scriptLanguage">groovy</stringProp>
           </JSR223PreProcessor>
           <hashTree/>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
@@ -373,13 +373,23 @@ vars.put(&quot;random&quot;, String.valueOf(randomValue))
             <stringProp name="filename"></stringProp>
             <stringProp name="cacheKey">true</stringProp>
             <stringProp name="script">import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
 
 def response = new JsonSlurper().parseText(prev.getResponseDataAsString())
-String random = vars.get(&quot;random&quot;)
-if (response.data.random != random) {
+def expectedResponseFile = new File(&quot;expected.json&quot;)
+def expected = new JsonSlurper().parseText(expectedResponseFile.text)
+String random = &quot;&quot;
+prev.getRequestHeaders().each { header -&gt;
+    if (header.getName().equalsIgnoreCase(&quot;random&quot;)) {
+        random = header.getValue()
+    }
+}
+expected.data.random = random;
+
+if (response != expected) {
 	prev.setSuccessful(false)
 	prev.setResponseMessage(&quot;Payload Assertion Failed = actual: &quot; 
-		+ prev.getResponseDataAsString() + &quot; expected: xyz&quot;)
+		+ JsonOutput.toJson(response) + &quot; expected: &quot; + JsonOutput.toJson(expected))
 }</stringProp>
           </JSR223PostProcessor>
           <hashTree/>

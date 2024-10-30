@@ -39,6 +39,7 @@ isolated function validateUserRole(graphql:Context context, string expectedRole)
 }
 
 isolated function initContext(http:RequestContext requestContext, http:Request request) returns graphql:Context|error {
+    log:printInfo("Reqeust recieved");
     graphql:Context context = new;
     context.set(DATASOURCE, datasource);
 
@@ -55,7 +56,6 @@ isolated function initContext(http:RequestContext requestContext, http:Request r
         }
         context.set(USER, user);
         context.set(USER_ID, userId);
-        log:printInfo(string `Received request from ${userId}`);
     }
     string random = check request.getHeader("random");
     context.set("random", random);
