@@ -38,6 +38,10 @@ final datasource:RedshiftDb redshift = check new;
 }
 isolated service on new graphql:Listener(httpListener) {
 
+    resource function get random(graphql:Context context) returns string|error {
+        return context.get("random").ensureType();
+    }
+
     resource function get movieStream(graphql:Context context, DirectorInputType director) returns Movie[]|error {
         do {
             datasource:Datasource datasource = check context.get(DATASOURCE).ensureType();

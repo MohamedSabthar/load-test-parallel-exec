@@ -5,6 +5,7 @@ query A(
   $userInput: [UserInputType!]!
   $directorInputArr: [DirectorInputType!]!
 ) {
+  random
   movieStream(director: $directorInput) {
     id
     title

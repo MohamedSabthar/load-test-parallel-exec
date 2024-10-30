@@ -64,7 +64,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "graphql"
-version = "1.13.1"
+version = "1.13.2"
 dependencies = [
 	{org = "ballerina", name = "auth"},
 	{org = "ballerina", name = "cache"},
@@ -145,7 +145,7 @@ version = "0.0.0"
 [[package]]
 org = "ballerina"
 name = "jwt"
-version = "2.12.1"
+version = "2.11.0"
 dependencies = [
 	{org = "ballerina", name = "cache"},
 	{org = "ballerina", name = "crypto"},

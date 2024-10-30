@@ -57,6 +57,8 @@ isolated function initContext(http:RequestContext requestContext, http:Request r
         context.set(USER_ID, userId);
         log:printInfo(string `Received request from ${userId}`);
     }
+    string random = check request.getHeader("random");
+    context.set("random", random);
     return context;
 }
 
