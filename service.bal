@@ -31,10 +31,7 @@ final datasource:RedshiftDb redshift = check new;
     interceptors: new TimeLog(),
     introspection: enableIntrospection,
     maxQueryDepth,
-    contextInit: initContext,
-    cacheConfig: {
-        maxSize: 200
-    }
+    contextInit: initContext
 }
 isolated service on new graphql:Listener(httpListener) {
 

@@ -53,7 +53,7 @@ isolated service class Movie {
     # + return - Average rating of the movie.
     isolated resource function get rating() returns float? {
         if self.score == 0 || self.reviewers == 0 {
-            return 0.0;
+            return 0;
         }
         return (<float>self.score / <float>self.reviewers).round(2);
     }
